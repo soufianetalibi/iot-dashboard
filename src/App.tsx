@@ -1,16 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Thermometer, Wifi, WifiOff, Activity } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+interface Device {
+  id: string;
+  name: string;
+  temp: number;
+  status: string;
+  history: never[];
+  lastUpdate?: string;
+}
+
+interface ChartDataPoint {
+  time: string;
+  [key: string]: number | string | null;
+}
+
 const IoTHub = () => {
-  const [devices, setDevices] = useState([
+  const [devices, setDevices] = useState<Device[]>([
     { id: 'DEV-001', name: 'Capteur Salon', temp: 20, status: 'online', history: [] },
     { id: 'DEV-002', name: 'Capteur Cuisine', temp: 22, status: 'online', history: [] },
     { id: 'DEV-003', name: 'Capteur Chambre', temp: 19, status: 'online', history: [] },
     { id: 'DEV-004', name: 'Capteur Bureau', temp: 21, status: 'online', history: [] },
     { id: 'DEV-005', name: 'Capteur Garage', temp: 15, status: 'online', history: [] }
   ]);
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [messageCount, setMessageCount] = useState(0);
 
   useEffect(() => {
@@ -31,7 +45,7 @@ const IoTHub = () => {
           };
         });
 
-        const newChartPoint = {
+        const newChartPoint: ChartDataPoint = {
           time: timestamp,
           ...Object.fromEntries(
             updatedDevices.map(d => [d.name, d.status === 'online' ? d.temp : null])
@@ -54,8 +68,8 @@ const IoTHub = () => {
 
   const onlineDevices = devices.filter(d => d.status === 'online').length;
 
-  const getStatusColor = (status) => status === 'online' ? 'text-green-500' : 'text-red-500';
-  const getTempColor = (temp) => {
+  const getStatusColor = (status: string) => status === 'online' ? 'text-green-500' : 'text-red-500';
+  const getTempColor = (temp: number) => {
     if (temp < 18) return 'text-blue-500';
     if (temp > 25) return 'text-orange-500';
     return 'text-green-500';
